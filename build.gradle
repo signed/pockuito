@@ -1,0 +1,15 @@
+apply plugin: "java"
+apply plugin: "idea"
+
+idea {
+    project {
+        ipr {
+            withXml {
+                def project = it.asNode()
+                def vcsDirectoryMappings = project.component.find { it.@name == 'VcsDirectoryMappings' };
+                vcsDirectoryMappings.children().clear()
+                vcsDirectoryMappings.appendNode('mapping', [ 'directory':'$PROJECT_DIR$', 'vcs':'Git'] )
+            }
+        }
+    }
+}
