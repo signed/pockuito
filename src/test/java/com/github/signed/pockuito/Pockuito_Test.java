@@ -3,7 +3,8 @@ package com.github.signed.pockuito;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class Pockuito_Test {
 
@@ -12,8 +13,9 @@ public class Pockuito_Test {
         assertThat(Pockuito.mockBuilder(SimpleBuilder.class), CoreMatchers.notNullValue());
     }
 
-    private class SimpleBuilder {
-
-
+    @Test
+    public void ifAMethodIsCalledOnTheMockOfTheBuilderItReturnsTheMock() throws Exception {
+        SimpleBuilder builderMock = Pockuito.mockBuilder(SimpleBuilder.class);
+        assertThat(builderMock.collectDetail("detail"), is(builderMock));
     }
 }
