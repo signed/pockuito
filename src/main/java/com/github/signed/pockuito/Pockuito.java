@@ -5,7 +5,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 public class Pockuito {
-    public static <T> T mockBuilder(final Class<T>classToMock){
+    public static <T> T mockBuilder(final Class<T> classToMock) {
         return Mockito.mock(classToMock, new BuilderMockBehaviour(classToMock));
     }
 
@@ -29,15 +29,41 @@ public class Pockuito {
         @Override
         public Object answer(InvocationOnMock invocation) throws Throwable {
             Class<?> returnType = invocation.getMethod().getReturnType();
-            if(returnType.equals(classToMock)){
+            if (returnType.equals(classToMock)) {
                 return invocation.getMock();
-            }else {
-                if(null == predefinedBuildArtifact){
-                    return Mockito.mock(returnType);
-                }else{
-                    return predefinedBuildArtifact;
+            } else {
+                if (null == predefinedBuildArtifact) {
+                    return new MockFromReturnType().createFrom(invocation);
+                } else {
+                    return new Predefined(predefinedBuildArtifact).createFrom(invocation);
                 }
             }
         }
+
+    }
+
+    private static class MockFromReturnType implements BuilderArtifactCreator {
+
+        @Override
+        public Object createFrom(InvocationOnMock invocation) {
+            return Mockito.mock(invocation.getMethod().getReturnType());
+        }
+    }
+
+    private static class Predefined implements BuilderArtifactCreator {
+        private final Object predefinedBuildArtifact;
+
+        public Predefined(Object predefinedBuildArtifact) {
+            this.predefinedBuildArtifact = predefinedBuildArtifact;
+        }
+
+        @Override
+        public Object createFrom(InvocationOnMock invocation) {
+            return this.predefinedBuildArtifact;
+        }
+    }
+
+    private static interface BuilderArtifactCreator {
+        Object createFrom(InvocationOnMock invocation);
     }
 }
