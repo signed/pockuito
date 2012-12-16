@@ -17,12 +17,12 @@ public class CucumberSteps {
         //set the scene, nothing to do
     }
 
-    @Given("^I created a mock for the SimpleBuilder$")
+    @Given("^I create a mock for the SimpleBuilder$")
     public void I_created_a_mock_for_the_SimpleBuilder() throws Throwable {
         mockedBuilder = Pockuito.mockBuilder(SimpleBuilder.class);
     }
 
-    @When("^I invoke a method that has SimpleBuilder as return type$")
+    @When("^I invoke a method on the mock that has SimpleBuilder as return type$")
     public void I_invoke_a_method_that_has_SimpleBuilder_as_return_type() throws Throwable {
         detailResponse = mockedBuilder.collectDetail("detail");
     }
