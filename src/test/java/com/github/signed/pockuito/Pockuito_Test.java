@@ -9,20 +9,20 @@ import static org.junit.Assert.assertThat;
 
 public class Pockuito_Test {
 
-    private final SimpleBuilder mockecBuilder = Pockuito.mockBuilder(SimpleBuilder.class);
+    private final SimpleBuilder mockedBuilder = Pockuito.mockBuilder(SimpleBuilder.class);
 
     @Test
     public void returnsAnInstanceOfTheClass() throws Exception {
-        assertThat(mockecBuilder, CoreMatchers.notNullValue());
+        assertThat(mockedBuilder, CoreMatchers.notNullValue());
     }
 
     @Test
     public void ifAMethodIsCalledOnTheMockOfTheBuilderItReturnsTheMock() throws Exception {
-        assertThat(mockecBuilder.collectDetail("detail"), is(mockecBuilder));
+        assertThat(mockedBuilder.collectDetail("detail"), is(mockedBuilder));
     }
 
     @Test
     public void returnAMockOfTheInstanceUnderConstructionIfTheBuildMethodIsCalled() throws Exception {
-        assertThat(mockecBuilder.build(), instanceOf(ObjectUnderConstruction.class));
+        assertThat(mockedBuilder.build(), instanceOf(ObjectUnderConstruction.class));
     }
 }

@@ -17,6 +17,8 @@ idea {
 dependencies {
     compile 'org.mockito:mockito-core:1.9.5'
     testCompile 'junit:junit-dep:4.10'
+    testCompile 'info.cukes:cucumber-java:1.1.1'
+    testCompile 'info.cukes:cucumber-junit:1.1.1'
 }
 
 configurations.all {
