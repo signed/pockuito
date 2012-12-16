@@ -1,5 +1,6 @@
 package com.github.signed.pockuito;
 
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -10,6 +11,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 
 public class CucumberSteps {
 
+    private final ObjectUnderConstruction predefinedBuildArtifact = new ObjectUnderConstruction("predefined");
     private SimpleBuilder mockedBuilder;
     private SimpleBuilder detailResponse;
     private ObjectUnderConstruction objectUnderConstruction;
@@ -22,6 +24,11 @@ public class CucumberSteps {
     @Given("^I create a mock for the SimpleBuilder$")
     public void I_created_a_mock_for_the_SimpleBuilder() throws Throwable {
         mockedBuilder = Pockuito.mockBuilder(SimpleBuilder.class);
+    }
+
+    @And("^I create a mock for the SimpleBuilder with a defined ObjectUnderConstruction$")
+    public void I_create_a_mock_for_the_SimpleBuilder_with_a_defined_ObjectUnderConstruction() throws Throwable {
+        mockedBuilder = Pockuito.mockBuilder(SimpleBuilder.class, predefinedBuildArtifact);
     }
 
     @When("^I invoke a method on the mock that has SimpleBuilder as return type$")
@@ -42,5 +49,10 @@ public class CucumberSteps {
     @Then("^the mock returns a mock of the methods return type$")
     public void the_mock_returns_a_mock_of_the_methods_return_type() throws Throwable {
         Assert.assertThat(objectUnderConstruction, instanceOf(ObjectUnderConstruction.class));
+    }
+
+    @Then("^the predefined ObjectUnderConstruction is returned$")
+    public void the_predefined_ObjectUnderConstruction_is_returned() throws Throwable {
+        Assert.assertThat(objectUnderConstruction, sameInstance(predefinedBuildArtifact));
     }
 }
