@@ -26,3 +26,74 @@ configurations.all {
         failOnVersionConflict()
     }
 }
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+group = 'com.github.signed.pockuito'
+version = '0.0.1-SNAPSHOT'
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+
+//http://jedicoder.blogspot.de/2011/11/automated-gradle-project-deployment-to.html
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            //beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "http://localhost:8081/nexus/content/repositories/snapshots") {
+                def login=deploymentNexusLocalLogin
+                def password=deploymentNexusLocalPassword
+                authentication(userName: login, password: password)
+            }
+
+            pom.project {
+                name 'pockutio'
+                packaging 'jar'
+                inceptionYear '2012'
+                description 'pockutio is a set of small extensions to mockito'
+                url 'https://github.com/signed/pockuito'
+
+                scm {
+                    url 'scm:git@github.com:signed/pockuito.git'
+                    connection 'scm:git://github.com/signed/pockuito.git'
+                    developerConnection 'scm:git@github.com:signed/pockuito.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The MIT License'
+                        url 'https://raw.github.com/signed/pockuito/master/license'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'thomasheilbronner'
+                        name 'Thomas Heilbronner'
+                    }
+                }
+            }
+        }
+    }
+}
