@@ -53,12 +53,11 @@ signing {
     sign configurations.archives
 }
 
-
 //http://jedicoder.blogspot.de/2011/11/automated-gradle-project-deployment-to.html
 uploadArchives {
     repositories {
         mavenDeployer {
-            //beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             repository(url: "http://localhost:8081/nexus/content/repositories/snapshots") {
                 def login=deploymentNexusLocalLogin
