@@ -31,7 +31,16 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.github.signed.pockuito'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
+
+//def repositoryUrl = 'http://localhost:8081/nexus/content/repositories/snapshots'
+def repositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
+if(project.hasProperty('release')){
+    project.version -= '-SNAPSHOT'
+    //repositoryUrl = 'http://localhost:8081/nexus/content/repositories/releases'
+    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+}
+
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
@@ -59,10 +68,8 @@ uploadArchives {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            repository(url: "http://localhost:8081/nexus/content/repositories/snapshots") {
-                def login=deploymentNexusLocalLogin
-                def password=deploymentNexusLocalPassword
-                authentication(userName: login, password: password)
+            repository(url: repositoryUrl) {
+                authentication(userName: deploymentNexusLocalLogin, password: deploymentNexusLocalPassword)
             }
 
             pom.project {
