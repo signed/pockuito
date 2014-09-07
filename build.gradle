@@ -1,5 +1,26 @@
 apply plugin: "java"
 apply plugin: "idea"
+apply plugin: "nexus"
+apply plugin: 'maven'
+
+group = 'com.github.signed.pockuito'
+version = '0.2.0-SNAPSHOT'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
+    }
+}
 
 idea {
     project {
@@ -33,81 +54,72 @@ configurations.all {
     }
 }
 
-apply plugin: 'maven'
-apply plugin: 'signing'
+modifyPom {
+    project {
+        name 'pockuito'
+        description 'pockuito is a set of small extensions to mockito'
+        url 'https://github.com/signed/pockuito'
+        inceptionYear '2012'
 
-group = 'com.github.signed.pockuito'
-version = '0.0.2-SNAPSHOT'
+        scm {
+            url 'scm:git@github.com:signed/pockuito.git'
+            connection 'scm:git://github.com/signed/pockuito.git'
+            developerConnection 'scm:git@github.com:signed/pockuito.git'
+        }
 
-//def repositoryUrl = 'http://localhost:8081/nexu/content/repositories/snapshots'
-def repositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
-if(project.hasProperty('release')){
-    project.version -= '-SNAPSHOT'
-    //repositoryUrl = 'http://localhost:8081/nexus/content/repositories/releases'
-    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
-}
-
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from 'build/docs/javadoc'
-}
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-
-artifacts {
-    archives jar
-    archives javadocJar
-    archives sourcesJar
-}
-
-signing {
-    sign configurations.archives
-}
-
-//http://jedicoder.blogspot.de/2011/11/automated-gradle-project-deployment-to.html
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: repositoryUrl) {
-                authentication(userName: deploymentNexusLocalLogin, password: deploymentNexusLocalPassword)
+        licenses {
+            license {
+                name 'The MIT License'
+                url 'https://raw.github.com/signed/pockuito/master/license'
+                distribution 'repo'
             }
+        }
 
-            pom.project {
-                name 'pockutio'
-                packaging 'jar'
-                inceptionYear '2012'
-                description 'pockutio is a set of small extensions to mockito'
-                url 'https://github.com/signed/pockuito'
-
-                scm {
-                    url 'scm:git@github.com:signed/pockuito.git'
-                    connection 'scm:git://github.com/signed/pockuito.git'
-                    developerConnection 'scm:git@github.com:signed/pockuito.git'
-                }
-
-                licenses {
-                    license {
-                        name 'The MIT License'
-                        url 'https://raw.github.com/signed/pockuito/master/license'
-                        distribution 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'thomasheilbronner'
-                        name 'Thomas Heilbronner'
-                    }
-                }
+        developers {
+            developer {
+                id 'thomasheilbronner'
+                name 'Thomas Heilbronner'
             }
         }
     }
+}
+
+def environments = [
+        'local': [
+                repositoryLogin: deploymentNexusLocalLogin,
+                repositoryPassword: deploymentNexusLocalPassword,
+                'urls': [
+                        'snapshot': 'http://localhost:8081/nexus/content/repositories/snapshots',
+                        'release' : 'http://localhost:8081/nexus/content/repositories/releases'
+
+                ]
+        ],
+        'sonatype': [
+                repositoryLogin: deploymentSonatypeLogin,
+                repositoryPassword: deploymentSonatypePassword,
+                'urls': [
+                        'snapshot': 'https://oss.sonatype.org/content/repositories/snapshots',
+                        'release' : 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+                ]
+        ]
+]
+
+def intent = hasProperty('release') ? 'release' : 'snapshot'
+def target = hasProperty('sonatype') ? 'sonatype' : 'local'
+println "intent: $intent target: $target url: ${environments.get(target).urls.get(intent)}"
+
+def environment = environments.get(target)
+if (project.hasProperty('release')) {
+    project.version -= '-SNAPSHOT'
+}
+
+ext.nexusUsername = environment.repositoryLogin
+ext.nexusPassword = environment.repositoryPassword
+
+nexus {
+    sign = project.property('signedDeployment')
+    repositoryUrl = environment.urls.release
+    snapshotRepositoryUrl = environment.urls.snapshot
 }
 
 task wrapper(type: Wrapper) {
