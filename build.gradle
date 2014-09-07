@@ -14,6 +14,12 @@ idea {
     }
 }
 
+repositories{
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+}
+
 dependencies {
     compile 'org.mockito:mockito-core:1.9.5'
     testCompile 'junit:junit-dep:4.10'
@@ -33,7 +39,7 @@ apply plugin: 'signing'
 group = 'com.github.signed.pockuito'
 version = '0.0.2-SNAPSHOT'
 
-//def repositoryUrl = 'http://localhost:8081/nexus/content/repositories/snapshots'
+//def repositoryUrl = 'http://localhost:8081/nexu/content/repositories/snapshots'
 def repositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
 if(project.hasProperty('release')){
     project.version -= '-SNAPSHOT'
@@ -102,4 +108,8 @@ uploadArchives {
             }
         }
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
 }

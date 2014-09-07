@@ -11,4 +11,7 @@ public class Pockuito {
         return Mockito.mock(classToMock, new BuilderMockBehaviour(classToMock, new Predefined(predefinedBuildArtifact)));
     }
 
+    public static <T> T verifyNoCallsTo(T mock) {
+        return Mockito.verify(mock, Mockito.times(0));
+    }
 }
